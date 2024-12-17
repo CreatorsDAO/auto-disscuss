@@ -1,0 +1,6 @@
+node_modules
+.env
+.DS_Store
+a.sh
+a.tar.gz
+auto-disscuss.2024-12-16.private-key.pem
