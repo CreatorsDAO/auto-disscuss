@@ -8,17 +8,30 @@
 //   ]
 // }'
 
-export const generateText = async (readme: string) => {
-  const content = `
+import { template } from "./config";
 
-  你是一个web3黑客松的评委，你熟悉最新的 web3 相关技术，同时是 SUI 的资深开发者。
-  这次你受邀参与 walrus的黑客松项目评审。请根据项目的描述，给出项目的评分，和评分理由。
-  评分满分100分。
+const renderTemplate = (
+  template: string,
+  state: Record<string, any>
+): string => {
+  return template.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (match, path) => {
+    // 处理嵌套属性路径，如 "user.name"
+    const value = path.split(".").reduce((obj: any, key: string) => {
+      return obj?.[key];
+    }, state);
 
-项目介绍如下：
+    // 处理 undefined 或 null 的情况
+    if (value === undefined || value === null) {
+      console.warn(`Warning: Template key "${path}" not found in state`);
+      return match; // 保留原始模板标记
+    }
 
-${readme}
-  `;
+    return String(value);
+  });
+};
+
+export const generateText = async (state: { readme: string }) => {
+  const content = renderTemplate(template, state);
 
   console.log("send : ", content);
 

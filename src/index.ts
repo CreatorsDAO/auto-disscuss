@@ -5,6 +5,7 @@ import { dirname } from "path";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { generateText } from "./openai";
+import { triggerGithubUsers } from "./config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -198,8 +199,6 @@ class DiscussionMonitor {
       }
     }
 
-    const triggerGithubUsers = ["v1xingyue", "ShirleneLiu", "wufen771"];
-
     // 如果有评论，检查第一条评论内容
     if (lastComment && lastComment.body.toLowerCase().includes("ai打分")) {
       console.log("检测到需要 ai 打分");
@@ -207,7 +206,7 @@ class DiscussionMonitor {
         console.log(`🎯 检测到AI打分请求（第一条评论），生成回复消息`);
         // 传入第一条评论的内容给 AI
         console.log("开始使用 AI 打分");
-        const response = await generateText(discussion.body);
+        const response = await generateText({ readme: discussion.body });
         return response;
       }
     }
