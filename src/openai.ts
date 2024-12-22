@@ -32,7 +32,7 @@ export const generateText = async (state: {
   readme: string;
   template: string;
 }) => {
-  const content = renderTemplate(template, state);
+  const content = renderTemplate(state.template, state);
 
   console.log("send : ", content);
 

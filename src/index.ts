@@ -69,8 +69,8 @@ class DiscussionMonitor {
     this.owner = process.env.GITHUB_OWNER || "";
     this.repo = process.env.GITHUB_REPO || "";
     this.checkInterval = parseInt(process.env.CHECK_INTERVAL || "60000");
-    this.pageSize = 30;
-    this.pageCount = 2; // 默认查询2页
+    this.pageSize = 50;
+    this.pageCount = 3; // 默认查询3页
     console.log(`🤖 监控机器人启动`);
     console.log(`📍 监控仓库: ${this.owner}/${this.repo}`);
     console.log(`⏱️  检查间隔: ${this.checkInterval}ms\n`);
@@ -173,22 +173,21 @@ class DiscussionMonitor {
   private async generateResponse(
     discussion: Discussion
   ): Promise<string | null> {
-    console.log("discussion", discussion.body);
-
+    // console.log("discussion", discussion.body);
     // 获取所有评论并按时间排序
     const comments = discussion.comments.nodes.sort(
       (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
 
-    console.log("comments", comments);
+    // console.log("comments", comments);
 
     // 获取第一条和最后一条评论
     const firstComment = comments[0];
     const lastComment = comments[comments.length - 1];
 
-    console.log("firstComment", firstComment);
-    console.log("lastComment", lastComment);
+    // console.log("firstComment", firstComment);
+    // console.log("lastComment", lastComment);
 
     // 如果最后一条是机器人的回复，直接跳过
     if (lastComment) {
@@ -209,7 +208,7 @@ class DiscussionMonitor {
               console.log(`trigger user: ${trigger.users}`);
               const response = await generateText({
                 readme: discussion.body,
-                template: template,
+                template: trigger.template,
               });
               return response;
             }
