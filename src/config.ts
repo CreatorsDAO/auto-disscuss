@@ -16,7 +16,7 @@ export const triggers: TriggerConfig[] = [
 
     项目介绍如下：
 
-    {{readme}}
+    {{body}}
 
     `,
   },

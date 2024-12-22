@@ -207,7 +207,7 @@ class DiscussionMonitor {
             if (trigger.users.includes(lastComment.author.login)) {
               console.log(`trigger user: ${trigger.users}`);
               const response = await generateText({
-                readme: discussion.body,
+                body: discussion.body,
                 template: trigger.template,
               });
               return response;

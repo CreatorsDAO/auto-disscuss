@@ -29,7 +29,7 @@ const renderTemplate = (
 };
 
 export const generateText = async (state: {
-  readme: string;
+  body: string;
   template: string;
 }) => {
   const content = renderTemplate(state.template, state);
