@@ -10,3 +10,5 @@ export const template = `
 {{readme}}
 
 `;
+
+export const triggerWords = "ai打分";

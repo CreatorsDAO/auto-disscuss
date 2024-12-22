@@ -5,7 +5,7 @@ import { dirname } from "path";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { generateText } from "./openai";
-import { triggerGithubUsers } from "./config";
+import { triggerGithubUsers, triggerWords } from "./config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -200,7 +200,7 @@ class DiscussionMonitor {
     }
 
     // 如果有评论，检查第一条评论内容
-    if (lastComment && lastComment.body.toLowerCase().includes("ai打分")) {
+    if (lastComment && lastComment.body.toLowerCase().includes(triggerWords)) {
       console.log("检测到需要 ai 打分");
       if (triggerGithubUsers.includes(lastComment.author.login)) {
         console.log(`🎯 检测到AI打分请求（第一条评论），生成回复消息`);
