@@ -5,7 +5,7 @@ import { dirname } from "path";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { generateText } from "./openai";
-import { template, triggerGithubUsers, triggers, triggerWords } from "./config";
+import { triggers } from "./config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
