@@ -8,8 +8,6 @@
 //   ]
 // }'
 
-import { template } from "./config";
-
 const renderTemplate = (
   template: string,
   state: Record<string, any>
@@ -30,7 +28,10 @@ const renderTemplate = (
   });
 };
 
-export const generateText = async (state: { readme: string }) => {
+export const generateText = async (state: {
+  readme: string;
+  template: string;
+}) => {
   const content = renderTemplate(template, state);
 
   console.log("send : ", content);
