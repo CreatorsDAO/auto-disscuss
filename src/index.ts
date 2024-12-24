@@ -148,9 +148,6 @@ class DiscussionMonitor {
     } catch (error) {
       console.error("❌ 监控discussions时发生错误:", error);
     }
-
-    // console.log(`\n⏳ ${this.checkInterval / 1000}秒后进行下一次检查...\n`);
-    // setTimeout(() => this.monitorDiscussions(), this.checkInterval);
   }
 
   private async handleDiscussion(discussion: Discussion) {
@@ -186,9 +183,6 @@ class DiscussionMonitor {
     const firstComment = comments[0];
     const lastComment = comments[comments.length - 1];
 
-    // console.log("firstComment", firstComment);
-    // console.log("lastComment", lastComment);
-
     // 如果最后一条是机器人的回复，直接跳过
     if (lastComment) {
       const botName = process.env.GITHUB_APP_BOT_NAME;
@@ -204,7 +198,10 @@ class DiscussionMonitor {
         for (const word of trigger.words) {
           if (lastComment && lastCommentBody.includes(word)) {
             console.log(`need auto disscuss bot : with ${word}`);
-            if (trigger.users.includes(lastComment.author.login)) {
+            if (
+              trigger.users.includes(lastComment.author.login) ||
+              trigger.users.includes("*")
+            ) {
               console.log(`trigger user: ${trigger.users}`);
               const response = await generateText({
                 body: discussion.body,

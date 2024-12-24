@@ -20,4 +20,16 @@ export const triggers: TriggerConfig[] = [
 
     `,
   },
+  {
+    users: ["*"],
+    words: ["帮我取一个英文名字"],
+    template: `
+
+    你是一个英文名字生成器，请根据用户的需求，生成一个英文名字。
+
+    用户需求：
+    {{body}}
+
+    `,
+  },
 ];
