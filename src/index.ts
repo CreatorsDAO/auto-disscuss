@@ -45,6 +45,10 @@ interface Discussion {
   number: number;
   url: string;
   updatedAt: string;
+  author: {
+    login: string;
+    url: string;
+  };
   comments: {
     nodes: Array<{
       body: string;
@@ -69,8 +73,8 @@ class DiscussionMonitor {
     this.owner = process.env.GITHUB_OWNER || "";
     this.repo = process.env.GITHUB_REPO || "";
     this.checkInterval = parseInt(process.env.CHECK_INTERVAL || "60000");
-    this.pageSize = 50;
-    this.pageCount = 3; // 默认查询3页
+    this.pageSize = 3;
+    this.pageCount = 1; // 默认查询3页
     console.log(`🤖 监控机器人启动`);
     console.log(`📍 监控仓库: ${this.owner}/${this.repo}`);
     console.log(`⏱️  检查间隔: ${this.checkInterval}ms\n`);
@@ -104,6 +108,10 @@ class DiscussionMonitor {
                   number
                   url
                   updatedAt
+                  author {
+                    login
+                    url
+                  }
                   comments(first: 100) {
                     nodes {
                       body
@@ -148,6 +156,9 @@ class DiscussionMonitor {
     } catch (error) {
       console.error("❌ 监控discussions时发生错误:", error);
     }
+
+    console.log(`\n⏳ ${this.checkInterval / 1000}秒后进行下一次检查...\n`);
+    setTimeout(() => this.monitorDiscussions(), this.checkInterval);
   }
 
   private async handleDiscussion(discussion: Discussion) {
@@ -170,20 +181,13 @@ class DiscussionMonitor {
   private async generateResponse(
     discussion: Discussion
   ): Promise<string | null> {
-    // console.log("discussion", discussion.body);
-    // 获取所有评论并按时间排序
     const comments = discussion.comments.nodes.sort(
       (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
 
-    // console.log("comments", comments);
-
-    // 获取第一条和最后一条评论
-    const firstComment = comments[0];
     const lastComment = comments[comments.length - 1];
 
-    // 如果最后一条是机器人的回复，直接跳过
     if (lastComment) {
       const botName = process.env.GITHUB_APP_BOT_NAME;
       if (lastComment.author.login === botName) {
@@ -192,22 +196,44 @@ class DiscussionMonitor {
       }
     }
 
-    if (lastComment) {
-      const lastCommentBody = lastComment.body.toLowerCase();
-      for (const trigger of triggers) {
-        for (const word of trigger.words) {
-          if (lastComment && lastCommentBody.includes(word)) {
-            console.log(`need auto disscuss bot : with ${word}`);
-            if (
-              trigger.users.includes(lastComment.author.login) ||
-              trigger.users.includes("*")
-            ) {
-              console.log(`trigger user: ${trigger.users}`);
-              const response = await generateText({
-                body: discussion.body,
-                template: trigger.template,
-              });
-              return response;
+    if (lastComment == null) {
+      console.log(`no comment found!!`);
+    }
+
+    for (const trigger of triggers) {
+      if (trigger.match_type === "last_comment" && lastComment == null) {
+        continue;
+      }
+      for (const word of trigger.words) {
+        if (lastComment) {
+          const lastCommentBody = lastComment.body.toLowerCase();
+          if (trigger.match_type === "last_comment") {
+            if (lastCommentBody.includes(word)) {
+              if (
+                trigger.users.includes(lastComment.author.login) ||
+                trigger.users.includes("*")
+              ) {
+                const response = await generateText({
+                  body: discussion.body,
+                  template: trigger.template,
+                });
+                return response;
+              }
+            }
+          }
+
+          if (trigger.match_type === "title") {
+            if (discussion.title.includes(word)) {
+              if (
+                trigger.users.includes("*") ||
+                trigger.users.includes(discussion.author.login)
+              ) {
+                const response = await generateText({
+                  body: discussion.body,
+                  template: trigger.template,
+                });
+                return response;
+              }
             }
           }
         }

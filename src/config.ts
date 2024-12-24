@@ -2,10 +2,12 @@ interface TriggerConfig {
   words: string[];
   template: string;
   users: string[];
+  match_type: "title" | "body" | "last_comment";
 }
 
 export const triggers: TriggerConfig[] = [
   {
+    match_type: "last_comment",
     users: ["v1xingyue", "ShirleneLiu", "wufen771"],
     words: ["ai打分"],
     template: `
@@ -22,7 +24,8 @@ export const triggers: TriggerConfig[] = [
   },
   {
     users: ["*"],
-    words: ["帮我取一个英文名字"],
+    words: ["帮我想一个英文名字"],
+    match_type: "title",
     template: `
 
     你是一个英文名字生成器，请根据用户的需求，生成一个英文名字。
