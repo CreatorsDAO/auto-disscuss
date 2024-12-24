@@ -73,8 +73,8 @@ class DiscussionMonitor {
     this.owner = process.env.GITHUB_OWNER || "";
     this.repo = process.env.GITHUB_REPO || "";
     this.checkInterval = parseInt(process.env.CHECK_INTERVAL || "60000");
-    this.pageSize = 3;
-    this.pageCount = 1; // 默认查询3页
+    this.pageSize = 50;
+    this.pageCount = 3; // 默认查询3页
     console.log(`🤖 监控机器人启动`);
     console.log(`📍 监控仓库: ${this.owner}/${this.repo}`);
     console.log(`⏱️  检查间隔: ${this.checkInterval}ms\n`);
@@ -201,6 +201,7 @@ class DiscussionMonitor {
     }
 
     for (const trigger of triggers) {
+      console.log(`trigger: ${trigger.match_type} with : ${trigger.words}`);
       if (trigger.match_type === "last_comment" && lastComment == null) {
         continue;
       }
@@ -221,19 +222,19 @@ class DiscussionMonitor {
               }
             }
           }
+        }
 
-          if (trigger.match_type === "title") {
-            if (discussion.title.includes(word)) {
-              if (
-                trigger.users.includes("*") ||
-                trigger.users.includes(discussion.author.login)
-              ) {
-                const response = await generateText({
-                  body: discussion.body,
-                  template: trigger.template,
-                });
-                return response;
-              }
+        if (trigger.match_type === "title") {
+          if (discussion.title.includes(word)) {
+            if (
+              trigger.users.includes("*") ||
+              trigger.users.includes(discussion.author.login)
+            ) {
+              const response = await generateText({
+                body: discussion.body,
+                template: trigger.template,
+              });
+              return response;
             }
           }
         }
